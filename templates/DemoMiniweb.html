@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniFrame - Lua Web Framework Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Minimal custom styles if needed */
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">MiniFrame</h1>
+            <ul class="flex space-x-4">
+                <li><a href="#home" class="hover:underline">Home</a></li>
+                <li><a href="#features" class="hover:underline">Features</a></li>
+                <li><a href="#docs" class="hover:underline">Docs</a></li>
+                <li><a href="#contact" class="hover:underline">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="bg-blue-700 text-white py-20 text-center">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold mb-4">Build Fast Web Apps with MiniFrame</h2>
+            <p class="text-xl mb-8">A lightweight, powerful web framework written in Lua for modern web development.</p>
+            <a href="#features" class="bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200">Learn More</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center mb-12">Key Features</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-6 bg-gray-50 rounded-lg shadow">
+                    <h4 class="text-xl font-semibold mb-2">Lightweight & Fast</h4>
+                    <p>LuaFrame is designed for speed and efficiency, perfect for high-performance applications.</p>
+                </div>
+                <div class="p-6 bg-gray-50 rounded-lg shadow">
+                    <h4 class="text-xl font-semibold mb-2">Easy Routing</h4>
+                    <p>Intuitive routing system to handle your web requests seamlessly.</p>
+                </div>
+                <div class="p-6 bg-gray-50 rounded-lg shadow">
+                    <h4 class="text-xl font-semibold mb-2">Extensible</h4>
+                    <p>Modular architecture allows easy integration with other Lua libraries.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Documentation Section -->
+    <section id="docs" class="py-16 bg-gray-100">
+        <div class="max-w-7xl mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center mb-12">Get Started with Documentation</h3>
+            <p class="text-center mb-8">Explore our comprehensive docs to start building with LuaFrame today.</p>
+            <div class="text-center">
+                <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700">View Docs</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center mb-12">Contact Us</h3>
+            <form class="max-w-md mx-auto">
+                <input type="text" placeholder="Your Name" class="w-full p-3 mb-4 border rounded">
+                <input type="email" placeholder="Your Email" class="w-full p-3 mb-4 border rounded">
+                <textarea placeholder="Your Message" class="w-full p-3 mb-4 border rounded h-32"></textarea>
+                <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-blue-600 text-white p-4 text-center">
+        <p>&copy; 2025 LuaFrame. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Minimal JavaScript for any necessary interactivity (e.g., smooth scrolling)
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

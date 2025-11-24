@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>MiniWeb (Lua) – Documentation & Tutorial</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0 1.5rem 3rem;
+      max-width: 960px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    header {
+      padding: 1.5rem 0 0.5rem;
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 1rem;
+    }
+    h1, h2, h3 {
+      font-weight: 600;
+    }
+    code {
+      font-family: "Fira Code", Consolas, "Courier New", monospace;
+      font-size: 0.95em;
+    }
+    pre {
+      background: #f5f5f5;
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      overflow-x: auto;
+      font-size: 0.9em;
+    }
+    nav {
+      background: #fafafa;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1.5rem;
+    }
+    nav ol {
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+    nav ol li {
+      margin: 0.15rem 0;
+    }
+    .tag {
+      display: inline-block;
+      background: #eee;
+      border-radius: 999px;
+      padding: 0 0.5rem;
+      font-size: 0.8em;
+      margin-left: 0.25rem;
+    }
+    .note {
+      border-left: 3px solid #0074d9;
+      background: #f0f7ff;
+      padding: 0.5rem 0.75rem;
+      margin: 0.75rem 0;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>MiniWeb (Lua)</h1>
+  <p>A tiny Bottle-style web microframework written in plain Lua.</p>
+</header>
+
+<nav>
+  <strong>Index</strong>
+  <ol>
+    <li><a href="#intro">1. Introduction</a></li>
+    <li><a href="#quickstart">2. Quickstart Tutorial</a></li>
+    <li><a href="#install">3. Installation & Setup</a></li>
+    <li><a href="#request-response">4. Request & Response Basics</a></li>
+    <li><a href="#routing">5. Routing</a>
+      <ol>
+        <li><a href="#routing-basic">5.1 Basic Routes</a></li>
+        <li><a href="#routing-params">5.2 Path Parameters</a></li>
+        <li><a href="#routing-wildcards">5.3 Wildcard Routes</a></li>
+        <li><a href="#routing-verbs">5.4 HTTP Verbs (GET/POST/PUT/DELETE)</a></li>
+      </ol>
+    </li>
+    <li><a href="#query-form">6. Query Strings & Form Data</a></li>
+    <li><a href="#middleware">7. Middleware</a>
+      <ol>
+        <li><a href="#middleware-global">7.1 Global <code>before</code> &amp; <code>after</code></a></li>
+        <li><a href="#middleware-route">7.2 Route-level Middleware</a></li>
+      </ol>
+    </li>
+    <li><a href="#response-object">8. Response Object Helpers</a></li>
+    <li><a href="#templates">9. Templates & Cache</a></li>
+    <li><a href="#static">10. Static File Serving</a></li>
+    <li><a href="#errors">11. Error Handling</a></li>
+    <li><a href="#reference">12. API Reference Summary</a></li>
+  </ol>
+</nav>
+
+<section id="intro">
+  <h2>1. Introduction</h2>
+  <p>
+    <strong>MiniWeb</strong> is a simple, educational web framework for Lua inspired by
+    microframeworks like Bottle. It is designed to be:
+  </p>
+  <ul>
+    <li>Single-file library (<code>miniweb.lua</code>)</li>
+    <li>Minimal dependencies (only <code>LuaSocket</code>)</li>
+    <li>Easy to read, tweak, and extend</li>
+  </ul>
+  <p>It provides:</p>
+  <ul>
+    <li>Routing with path parameters and wildcards</li>
+    <li>Support for GET/POST/PUT/DELETE</li>
+    <li>Query string & form data parsing</li>
+    <li>Global and route-level middleware</li>
+    <li>A simple response object with helpers (<code>res:text</code>, <code>res:html</code>, <code>res:json</code>)</li>
+    <li>Template rendering with tiny cache</li>
+    <li>Static file serving</li>
+    <li>Customizable error handlers</li>
+  </ul>
+</section>
+
+<section id="quickstart">
+  <h2>2. Quickstart Tutorial</h2>
+
+  <h3>2.1 Directory layout</h3>
+  <pre><code>.
+├── miniweb.lua          &lt;-- the framework
+├── app.lua              &lt;-- your application
+├── templates
+│   └── index.html
+└── public
+    └── style.css
+</code></pre>
+
+  <h3>2.2 Minimal <code>app.lua</code></h3>
+  <pre><code>local miniweb = require "miniweb"
+local app = miniweb.new()
+
+-- Global logging
+app:before(function(req)
+    print(string.format("[REQ] %s %s", req.method, req.path))
+end)
+
+-- Static files under /static
+app:static("/static", "public")
+
+-- Home page using a template
+app:get("/", function(req, res)
+    local html, err = app:render("templates/index.html", {
+        title   = "MiniWeb Demo",
+        heading = "Welcome to MiniWeb",
+        name    = "Jeff",
+    })
+    if not html then
+        res:text("Template error: " .. tostring(err), 500)
+        return
+    end
+    res:html(html)
+end)
+
+-- Simple JSON endpoint
+app:get("/api/ping", function(req, res)
+    res:json({ status = "ok", time = os.time() })
+end)
+
+app:run("127.0.0.1", 8080)
+</code></pre>
+
+  <h3>2.3 Run the server</h3>
+  <pre><code>lua app.lua
+# Visit: http://127.0.0.1:8080/</code></pre>
+</section>
+
+<section id="install">
+  <h2>3. Installation & Setup</h2>
+
+  <h3>3.1 Requirements</h3>
+  <ul>
+    <li>Lua 5.1–5.4 (or LuaJIT)</li>
+    <li><code>LuaSocket</code> (installed via LuaRocks)</li>
+  </ul>
+
+  <h3>3.2 Install LuaSocket</h3>
+  <pre><code>luarocks install luasocket</code></pre>
+
+  <h3>3.3 Add <code>miniweb.lua</code> to your project</h3>
+  <p>
+    Place the <code>miniweb.lua</code> file in your working directory (or somewhere in
+    <code>package.path</code>) so you can:
+  </p>
+  <pre><code>local miniweb = require "miniweb"
+local app = miniweb.new()</code></pre>
+</section>
+
+<section id="request-response">
+  <h2>4. Request &amp; Response Basics</h2>
+
+  <h3>4.1 Request object</h3>
+  <p>Each route handler receives a <code>req</code> table with:</p>
+  <ul>
+    <li><code>req.method</code> &mdash; HTTP method (e.g. <code>"GET"</code>)</li>
+    <li><code>req.path</code> &mdash; path without query, e.g. <code>"/hello/Jeff"</code></li>
+    <li><code>req.raw_path</code> &mdash; original path including query</li>
+    <li><code>req.http_version</code> &mdash; string like <code>"1.1"</code></li>
+    <li><code>req.headers</code> &mdash; lowercase header name → value</li>
+    <li><code>req.params</code> &mdash; path parameters (e.g. <code>:name</code>, <code>*rest</code>)</li>
+    <li><code>req.query</code> &mdash; query string table</li>
+    <li><code>req.body</code> &mdash; raw request body</li>
+    <li><code>req.form</code> &mdash; parsed form data (for <code>application/x-www-form-urlencoded</code>)</li>
+    <li><code>req.context</code> &mdash; free scratchpad shared across middleware/handlers</li>
+  </ul>
+
+  <h3>4.2 Response object</h3>
+  <p>
+    Each handler also receives a <code>res</code> object which you normally use via
+    helper methods. The simplest:
+  </p>
+  <pre><code>app:get("/plain", function(req, res)
+    res:text("Hello from MiniWeb!\n")
+end)</code></pre>
+
+  <p>You can also use the “legacy” style return:</p>
+  <pre><code>app:get("/legacy", function(req, res)
+    return "Legacy body\n", 200, { ["X-Foo"] = "bar" }
+end)</code></pre>
+</section>
+
+<section id="routing">
+  <h2>5. Routing</h2>
+
+  <section id="routing-basic">
+    <h3>5.1 Basic Routes</h3>
+    <p>
+      Use <code>app:get</code>, <code>app:post</code>, <code>app:put</code>,
+      <code>app:delete</code> to register routes. Each takes a path pattern and one or
+      more handler functions (for route-level middleware).
+    </p>
+
+    <pre><code>-- Simple GET route
+app:get("/", function(req, res)
+    res:text("Hello from /.\\n")
+end)
+
+-- Another GET route
+app:get("/about", function(req, res)
+    res:html("&lt;h1&gt;About&lt;/h1&gt;&lt;p&gt;MiniWeb demo.&lt;/p&gt;")
+end)</code></pre>
+  </section>
+
+  <section id="routing-params">
+    <h3>5.2 Path Parameters</h3>
+    <p>
+      You can define named parameters with <code>:name</code>. Each parameter is exposed
+      via <code>req.params.&lt;name&gt;</code>.
+    </p>
+
+    <pre><code>-- /hello/Jeff → req.params.name == "Jeff"
+app:get("/hello/:name", function(req, res)
+    local name = req.params.name or "world"
+    res:text("Hello, " .. name .. "!\\n")
+end)
+
+-- /users/42/posts/3
+app:get("/users/:uid/posts/:pid", function(req, res)
+    local uid = req.params.uid
+    local pid = req.params.pid
+    res:json({ user = uid, post = pid })
+end)</code></pre>
+  </section>
+
+  <section id="routing-wildcards">
+    <h3>5.3 Wildcard Routes</h3>
+    <p>
+      Wildcards use <code>*name</code> and are supported as the <em>final</em> path
+      segment. Everything after that point is captured into
+      <code>req.params[name]</code>.
+    </p>
+
+    <pre><code>-- /files/a.txt          → path = "a.txt"
+-- /files/sub/dir/x.bin  → path = "sub/dir/x.bin"
+app:get("/files/*path", function(req, res)
+    local path = req.params.path or ""
+    res:text("You requested file path: " .. path .. "\\n")
+end)
+
+-- /pages/about/team → slug = "about/team"
+app:get("/pages/*slug", function(req, res)
+    res:json({
+        route = "pages",
+        slug  = req.params.slug
+    })
+end)</code></pre>
+  </section>
+
+  <section id="routing-verbs">
+    <h3>5.4 HTTP Verbs (GET/POST/PUT/DELETE)</h3>
+
+    <pre><code>local items = {}
+
+-- Create via POST
+app:post("/items", function(req, res)
+    local name  = req.form.name  or "unnamed"
+    local value = req.form.value or "0"
+    local id = #items + 1
+    items[id] = { id = id, name = name, value = value }
+    res:json(items[id], 201)
+end)
+
+-- List via GET
+app:get("/items", function(req, res)
+    res:json(items)
+end)
+
+-- Update via PUT
+app:put("/items/:id", function(req, res)
+    local id = tonumber(req.params.id or "0") or 0
+    if not items[id] then
+        res:text("Not found\\n", 404)
+        return
+    end
+    items[id].name  = req.form.name  or items[id].name
+    items[id].value = req.form.value or items[id].value
+    res:json(items[id])
+end)
+
+-- Delete via DELETE
+app:delete("/items/:id", function(req, res)
+    local id = tonumber(req.params.id or "0") or 0
+    if not items[id] then
+        res:text("Not found\\n", 404)
+        return
+    end
+    table.remove(items, id)
+    res:text("Deleted\\n")
+end)</code></pre>
+
+    <p>Tutorial test with <code>curl</code>:</p>
+    <pre><code># Create items
+curl -X POST -d "name=foo&amp;value=1" http://127.0.0.1:8080/items
+curl -X POST -d "name=bar&amp;value=2" http://127.0.0.1:8080/items
+
+# List
+curl http://127.0.0.1:8080/items
+
+# Update
+curl -X PUT -d "name=baz" http://127.0.0.1:8080/items/1
+
+# Delete
+curl -X DELETE http://127.0.0.1:8080/items/2</code></pre>
+  </section>
+</section>
+
+<section id="query-form">
+  <h2>6. Query Strings &amp; Form Data</h2>
+
+  <h3>6.1 Query strings</h3>
+  <p>
+    Query strings are parsed into <code>req.query</code>. Keys and values are
+    URL-decoded.
+  </p>
+
+  <pre><code>-- /search?q=lua&amp;page=2
+app:get("/search", function(req, res)
+    local q    = req.query.q    or ""
+    local page = tonumber(req.query.page or "1") or 1
+    res:text(string.format("Search for '%s', page %d\\n", q, page))
+end)</code></pre>
+
+  <h3>6.2 Form data (POST/PUT)</h3>
+  <p>
+    For requests with <code>Content-Type: application/x-www-form-urlencoded</code>,
+    the body is parsed into <code>req.form</code>.
+  </p>
+
+  <pre><code>-- curl -X POST -d "username=jeff&amp;password=secret" \
+--      http://127.0.0.1:8080/login
+app:post("/login", function(req, res)
+    local user = req.form.username or ""
+    local pass = req.form.password or ""
+    if user == "jeff" and pass == "secret" then
+        res:text("Welcome, " .. user .. "\\n")
+    else
+        res:text("Invalid login\\n", 401)
+    end
+end)</code></pre>
+
+  <div class="note">
+    <strong>Note:</strong> For other content types (e.g. JSON), you can parse
+    <code>req.body</code> manually in your handler.
+  </div>
+</section>
+
+<section id="middleware">
+  <h2>7. Middleware</h2>
+  <p>
+    MiniWeb supports two levels of middleware:
+    <span class="tag">global</span> and <span class="tag">route-level</span>.
+  </p>
+
+  <section id="middleware-global">
+    <h3>7.1 Global <code>before</code> &amp; <code>after</code></h3>
+
+    <p>
+      Global middleware runs for every request. <code>before</code> handlers run
+      before routing; <code>after</code> handlers run after the handler, just before
+      the response is sent.
+    </p>
+
+    <pre><code>-- Log every request (before routing)
+app:before(function(req)
+    req.context.start_time = os.clock()
+    print(string.format("[REQ] %s %s", req.method, req.path))
+end)
+
+-- Add a header and timing info (after handler)
+app:after(function(req, res)
+    local elapsed = 0
+    if req.context.start_time then
+        elapsed = os.clock() - req.context.start_time
+    end
+    res:set_header("X-Powered-By", "MiniWeb/Lua")
+    res:set_header("X-Response-Time", string.format("%.4f", elapsed))
+end)</code></pre>
+  </section>
+
+  <section id="middleware-route">
+    <h3>7.2 Route-level Middleware</h3>
+
+    <p>
+      Route-level middleware is attached to a specific route. You pass them as
+      extra arguments before the actual handler:
+    </p>
+
+    <pre><code>-- Route-level middleware: require API key
+local function require_api_key(req, res)
+    local key = req.headers["x-api-key"]
+    if key ~= "secret123" then
+        res:set_status(401)
+        res:text("Unauthorized\\n")
+        req.context.halt = true   -- short-circuit: do not run handler
+    end
+end
+
+-- Route-level middleware: log that we hit the "secret" route
+local function route_logger(req, res)
+    print("[Route] /secret hit")
+end
+
+-- Protected route
+app:get("/secret", route_logger, require_api_key, function(req, res)
+    res:text("Welcome to the secret area.\\n")
+end)</code></pre>
+
+    <p>
+      Any route middleware can set <code>req.context.halt = true</code> to prevent
+      the main handler from running.
+    </p>
+  </section>
+</section>
+
+<section id="response-object">
+  <h2>8. Response Object Helpers</h2>
+
+  <p>The <code>res</code> object wraps the response status, headers, and body.</p>
+
+  <ul>
+    <li><code>res:set_status(code)</code></li>
+    <li><code>res:set_header(name, value)</code></li>
+    <li><code>res:text(body, status?)</code></li>
+    <li><code>res:html(body, status?)</code></li>
+    <li><code>res:json(table, status?)</code></li>
+  </ul>
+
+  <h3>8.1 Examples</h3>
+
+  <pre><code>-- Plain text
+app:get("/plain", function(req, res)
+    res:text("Plain text response\\n")
+end)
+
+-- HTML
+app:get("/welcome", function(req, res)
+    res:html("&lt;h1&gt;Welcome&lt;/h1&gt;&lt;p&gt;Hello from MiniWeb&lt;/p&gt;")
+end)
+
+-- JSON
+app:get("/info", function(req, res)
+    res:json({
+        framework = "MiniWeb",
+        version   = "0.1",
+        features  = { "routing", "middleware", "templates" }
+    })
+end)
+
+-- Manually adjust status and headers
+app:get("/teapot", function(req, res)
+    res:set_status(418)
+    res:set_header("X-Tea", "Earl Grey")
+    res:text("I'm a teapot\\n")
+end)</code></pre>
+</section>
+
+<section id="templates">
+  <h2>9. Templates &amp; Template Cache</h2>
+
+  <p>
+    MiniWeb provides a tiny template engine with a simple cache. Templates are
+    just text files with <code>{{ name }}</code> placeholders. When you call
+    <code>app:render(path, data)</code>:
+  </p>
+  <ul>
+    <li>The template file is read once and cached in <code>app.template_cache</code>.</li>
+    <li>For subsequent calls, the cached version is used.</li>
+  </ul>
+
+  <h3>9.1 Template file</h3>
+
+  <pre><code>&lt;!-- templates/index.html --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;{{ title }}&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;{{ heading }}&lt;/h1&gt;
+  &lt;p&gt;Hello, {{ name }}!&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+  <h3>9.2 Rendering from a route</h3>
+
+  <pre><code>app:get("/", function(req, res)
+    local html, err = app:render("templates/index.html", {
+        title   = "MiniWeb Demo",
+        heading = "Welcome",
+        name    = "Jeff",
+    })
+    if not html then
+        res:text("Template error: " .. tostring(err), 500)
+        return
+    end
+    res:html(html)
+end)</code></pre>
+
+  <div class="note">
+    <strong>Note:</strong> The template engine is intentionally minimal:
+    it only supports <code>{{ key }}</code> substitutions and no control
+    flow (loops, ifs, etc.).
+  </div>
+</section>
+
+<section id="static">
+  <h2>10. Static File Serving</h2>
+
+  <p>
+    Static files (CSS, JS, images) can be served via <code>app:static(url_prefix, root_dir)</code>.
+    Only <code>GET</code> is supported.
+  </p>
+
+  <h3>10.1 Configuration</h3>
+
+  <pre><code>-- Serve /static/* from ./public
+app:static("/static", "public")</code></pre>
+
+  <p>
+    For example, a request to <code>/static/style.css</code> will serve
+    <code>public/style.css</code> if it exists.
+  </p>
+
+  <h3>10.2 Example usage in a template</h3>
+
+  <pre><code>&lt;link rel="stylesheet" href="/static/style.css"&gt;
+&lt;img src="/static/logo.png" alt="Logo"&gt;</code></pre>
+
+  <p>
+    Content type is guessed from the file extension (e.g. <code>.css</code>,
+    <code>.js</code>, <code>.png</code>, etc.).
+  </p>
+</section>
+
+<section id="errors">
+  <h2>11. Error Handling</h2>
+
+  <p>
+    MiniWeb lets you register custom error handlers using
+    <code>app:error(code_or_name, handler)</code>.
+  </p>
+
+  <ul>
+    <li><code>app:error(404, handler)</code> &mdash; handle 404 Not Found</li>
+    <li><code>app:error(500, handler)</code> &mdash; handle 500 Server Error</li>
+    <li><code>app:error("default", handler)</code> &mdash; fallback for other statuses</li>
+  </ul>
+
+  <h3>11.1 Example: HTML 404 page</h3>
+
+  <pre><code>-- templates/404.html
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;meta charset="utf-8"&gt;&lt;title&gt;Not Found&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;404 - Not Found&lt;/h1&gt;
+  &lt;p&gt;No route for &lt;code&gt;{{ path }}&lt;/code&gt;.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+  <pre><code>-- Register 404 handler
+app:error(404, function(req, res, msg)
+    local html, err = app:render("templates/404.html", {
+        path    = req.path,
+        message = msg or "Not found",
+    })
+    if not html then
+        res:text("404 Not found: " .. tostring(req.path), 404)
+        return
+    end
+    res:html(html, 404)
+end)</code></pre>
+
+  <h3>11.2 Example: 500 error handler</h3>
+
+  <pre><code>-- templates/500.html
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;meta charset="utf-8"&gt;&lt;title&gt;Server Error&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;500 - Internal Server Error&lt;/h1&gt;
+  &lt;pre&gt;{{ message }}&lt;/pre&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+  <pre><code>app:error(500, function(req, res, msg)
+    local html, err = app:render("templates/500.html", {
+        message = msg or "Something went wrong",
+    })
+    if not html then
+        res:text("Internal server error", 500)
+        return
+    end
+    res:html(html, 500)
+end)
+
+-- Route that intentionally fails to demonstrate 500 page
+app:get("/boom", function(req, res)
+    error("Kaboom from /boom")
+end)</code></pre>
+
+  <h3>11.3 Default error handler</h3>
+
+  <pre><code>app:error("default", function(req, res, msg)
+    -- Will be used for statuses without a specific handler
+    res:text("Error " .. tostring(res.status or "?") ..
+             ": " .. tostring(msg or "Unknown") .. "\\n",
+             res.status or 500)
+end)</code></pre>
+</section>
+
+<section id="reference">
+  <h2>12. API Reference Summary</h2>
+
+  <h3>12.1 Module</h3>
+  <pre><code>local miniweb = require "miniweb"
+local app = miniweb.new()</code></pre>
+
+  <h3>12.2 Application methods</h3>
+  <ul>
+    <li><code>app:get(pattern, [mw1, ...], handler)</code></li>
+    <li><code>app:post(pattern, [mw1, ...], handler)</code></li>
+    <li><code>app:put(pattern, [mw1, ...], handler)</code></li>
+    <li><code>app:delete(pattern, [mw1, ...], handler)</code></li>
+    <li><code>app:before(handler)</code> &mdash; global “before” middleware</li>
+    <li><code>app:after(handler)</code> &mdash; global “after” middleware</li>
+    <li><code>app:static(url_prefix, root_dir)</code> &mdash; static file mapping</li>
+    <li><code>app:render(path, data)</code> &mdash; render template (cached)</li>
+    <li><code>app:error(code_or_name, handler)</code> &mdash; error handlers</li>
+    <li><code>app:run(host, port)</code> &mdash; start the server</li>
+  </ul>
+
+  <h3>12.3 Route patterns</h3>
+  <ul>
+    <li>Literal segments: <code>"/about"</code>, <code>"/users/list"</code></li>
+    <li>Named params: <code>"/hello/:name"</code>, <code>"/users/:id/posts/:pid"</code></li>
+    <li>Wildcard (last segment only): <code>"/files/*path"</code>, <code>"/pages/*slug"</code></li>
+  </ul>
+
+  <h3>12.4 Request fields</h3>
+  <ul>
+    <li><code>req.method</code>, <code>req.path</code>, <code>req.raw_path</code>, <code>req.http_version</code></li>
+    <li><code>req.headers</code>, <code>req.params</code>, <code>req.query</code></li>
+    <li><code>req.body</code>, <code>req.form</code></li>
+    <li><code>req.context</code> (shared scratchpad across middleware/handlers)</li>
+  </ul>
+
+  <h3>12.5 Response methods</h3>
+  <ul>
+    <li><code>res:set_status(code)</code></li>
+    <li><code>res:set_header(name, value)</code></li>
+    <li><code>res:text(body, status?)</code></li>
+    <li><code>res:html(body, status?)</code></li>
+    <li><code>res:json(table, status?)</code></li>
+  </ul>
+
+  <p>
+    This documentation page is meant as both a tutorial and a reference.
+    You can save it as <code>miniweb-docs.html</code>, open it in a browser, and
+    tweak the examples directly to fit your own projects.
+  </p>
+</section>
+
+</body>
+</html>
+

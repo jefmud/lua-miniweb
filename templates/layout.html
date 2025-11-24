@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Top navigation -->
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center gap-2">
+        <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-sky-400 to-emerald-400 text-slate-950 font-black text-lg">
+          M
+        </span>
+        <div class="leading-tight">
+          <div class="text-sm font-semibold tracking-wide uppercase text-slate-300">MiniWeb</div>
+          <div class="text-xs text-slate-400">Tiny Lua Markdown Blog</div>
+        </div>
+      </a>
+      <!-- <nav class="flex items-center gap-3 text-sm">
+        <a href="/" class="text-slate-300 hover:text-sky-300">Home</a>
+        <a href="/admin" class="text-slate-300 hover:text-sky-300">Admin</a>
+        <a href="/login" class="text-slate-300 hover:text-emerald-300">Login</a>
+      </nav> -->
+      <nav class="flex items-center gap-3 text-sm">
+  	<a href="/" class="text-slate-300 hover:text-sky-300">Home</a>
+ 	 {{ nav_links }}
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="flex-1">
+    <div class="max-w-5xl mx-auto px-4 py-10">
+      {{ content }}
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 bg-slate-950/90">
+    <div class="max-w-5xl mx-auto px-4 py-4 text-xs text-slate-500 flex items-center justify-between">
+      <span>MiniWeb Blog Tutorial · Lua + Tailwind</span>
+      <span>Built with a tiny homegrown framework</span>
+    </div>
+  </footer>
+</body>
+</html>
+
