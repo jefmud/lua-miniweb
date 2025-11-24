@@ -31,7 +31,7 @@ Disclaimer -- this is EARLY in development! Caveat Emptor.  Drop me a line if yo
 
 ## 1. Introduction
 
-**MiniWeb** is a simple, educational web framework for Lua inspired by microframeworks like Bottle. It is designed to be:
+**MiniWeb** is a simple, educational web framework for Lua inspired by microframeworks like Marcel Helkamp's Bottle framework (https://github.com/bottlepy/bottle). I'm a fan of his work! It is designed to be:
 
 - Single-file library (`miniweb.lua`)
 - Minimal dependencies (only `LuaSocket`)
