@@ -356,6 +356,8 @@ Global middleware runs for every request.
 -- Log every request (before routing)
 app:before(function(req)
     req.context.start_time = os.clock()
+    -- this next line is not required since I added a console log
+    --   to miniweb.lua
     print(string.format("[REQ] %s %s", req.method, req.path))
 end)
 
