@@ -162,8 +162,7 @@ Example:
 
 ```lua
 app:get("/plain", function(req, res)
-    res:text("Hello from MiniWeb!
-")
+    res:text("Hello from MiniWeb!")
 end)
 ```
 
@@ -171,8 +170,7 @@ You can also use the “legacy” style where the handler `return`s:
 
 ```lua
 app:get("/legacy", function(req, res)
-    return "Legacy body
-", 200, { ["X-Foo"] = "bar" }
+    return "Legacy body", 200, { ["X-Foo"] = "bar" }
 end)
 ```
 
@@ -187,8 +185,7 @@ Use `app:get`, `app:post`, `app:put`, `app:delete` to register routes. Each take
 ```lua
 -- Simple GET route
 app:get("/", function(req, res)
-    res:text("Hello from /.
-")
+    res:text("Hello from Miniweb and Lua")
 end)
 
 -- Another GET route
@@ -207,8 +204,7 @@ You can define named parameters with `:name`. Each parameter is exposed as `req.
 -- /hello/Jeff → req.params.name == "Jeff"
 app:get("/hello/:name", function(req, res)
     local name = req.params.name or "world"
-    res:text("Hello, " .. name .. "!
-")
+    res:text("Hello, " .. name .. "!")
 end)
 
 -- /users/42/posts/3
@@ -230,8 +226,7 @@ Wildcards use `*name` and are supported as the **final** path segment. Everythin
 -- /files/sub/dir/x.bin  → path = "sub/dir/x.bin"
 app:get("/files/*path", function(req, res)
     local path = req.params.path or ""
-    res:text("You requested file path: " .. path .. "
-")
+    res:text("You requested file path: <" .. path .. ">")
 end)
 
 -- /pages/about/team → slug = "about/team"
@@ -268,8 +263,7 @@ end)
 app:put("/items/:id", function(req, res)
     local id = tonumber(req.params.id or "0") or 0
     if not items[id] then
-        res:text("Not found
-", 404)
+        res:text("Not found", 404)
         return
     end
     items[id].name  = req.form.name  or items[id].name
@@ -281,13 +275,11 @@ end)
 app:delete("/items/:id", function(req, res)
     local id = tonumber(req.params.id or "0") or 0
     if not items[id] then
-        res:text("Not found
-", 404)
+        res:text("Not found", 404)
         return
     end
     table.remove(items, id)
-    res:text("Deleted
-")
+    res:text("Deleted")
 end)
 ```
 
@@ -321,8 +313,7 @@ Query strings are parsed into `req.query`. Keys and values are URL-decoded.
 app:get("/search", function(req, res)
     local q    = req.query.q    or ""
     local page = tonumber(req.query.page or "1") or 1
-    res:text(string.format("Search for '%s', page %d
-", q, page))
+    res:text(string.format("Search for '%s', page %d", q, page))
 end)
 ```
 
@@ -336,11 +327,9 @@ app:post("/login", function(req, res)
     local user = req.form.username or ""
     local pass = req.form.password or ""
     if user == "jeff" and pass == "secret" then
-        res:text("Welcome, " .. user .. "
-")
+        res:text("Welcome, " .. user .. "!")
     else
-        res:text("Invalid login
-", 401)
+        res:text("Invalid login", 401)
     end
 end)
 ```
@@ -393,8 +382,7 @@ local function require_api_key(req, res)
     local key = req.headers["x-api-key"]
     if key ~= "secret123" then
         res:set_status(401)
-        res:text("Unauthorized
-")
+        res:text("Unauthorized")
         req.context.halt = true   -- short-circuit: do not run handler
     end
 end
@@ -406,8 +394,7 @@ end
 
 -- Protected route
 app:get("/secret", route_logger, require_api_key, function(req, res)
-    res:text("Welcome to the secret area.
-")
+    res:text("Welcome to the secret area.")
 end)
 ```
 
@@ -432,8 +419,7 @@ Available methods:
 ```lua
 -- Plain text
 app:get("/plain", function(req, res)
-    res:text("Plain text response
-")
+    res:text("Plain text response")
 end)
 
 -- HTML
@@ -454,8 +440,7 @@ end)
 app:get("/teapot", function(req, res)
     res:set_status(418)
     res:set_header("X-Tea", "Earl Grey")
-    res:text("I'm a teapot
-")
+    res:text("I'm a teapot")
 end)
 ```
 
@@ -634,8 +619,7 @@ app:error("default", function(req, res, msg)
     -- Will be used for statuses without a specific handler
     res:text(
         "Error " .. tostring(res.status or "?") ..
-        ": " .. tostring(msg or "Unknown") .. "
-",
+        ": " .. tostring(msg or "Unknown") .. "",
         res.status or 500
     )
 end)
@@ -691,4 +675,4 @@ local app = miniweb.new()
 
 ---
 
-You can drop this Markdown into a `README.md` next to `miniweb.lua` so you can edit it in your favorite Markdown editor and keep the documentation close to the code.
+You can drop this Markdown into a `README.md` next to `miniweb.lua` so you can edit it in your favorite Markdown editor and keep the documentation close to the code. Why not!?
