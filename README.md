@@ -2,7 +2,9 @@
 
 A tiny Bottle-style web microframework written in plain Lua.
 
-Disclaimer -- this is EARLY in development! Caveat Emptor.  Drop me a line if you are interested in this project.
+Disclaimers -- this is EARLY in development! Caveat Emptor. **LLM assisted project** - GPT-OSS 120b.
+
+Drop me a line if you are interested in this project.
 
 ---
 
