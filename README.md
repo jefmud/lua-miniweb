@@ -2,6 +2,8 @@
 
 A tiny Bottle-style web microframework written in plain Lua.
 
+Disclaimer -- this is EARLY in development! Caveat Emptor.  Drop me a line if you are interested in this project.
+
 ---
 
 ## Index
